@@ -24,30 +24,100 @@
   background-color: #e62424;
 } */
     </style>
-    _cellData = [
-    ["Anger", 3],
-    ["Disgust"， 3],
-    ["Fear"， 3],
-    ["Happiness"， 3],
-    ["Sadness"， 3],
-    ["Surprise"， 3],
-
-    ["AU1"， 5],
-    ["AU2"， 5],
-    ["AU4"， 5],
-    ["AU5"， 5],
-    ["AU9"， 5],
-    ["AU12"， 5],
-    ["AU15"， 5],
-    ["AU17"， 5],
-    ["AU25"， 5],
-    ["AU27"， 5],
-
-    ["Normal"， 5],
-    ["Pain"， 5]
-    ];
 
     <script>
+        _cellData = [
+            ["Anger", 3],
+            ["Disgust", 3],
+            ["Fear", 3],
+            ["Happiness", 3],
+            ["Sadness", 3],
+            ["Surprise", 3],
+
+            ["AU1", 5],
+            ["AU2", 5],
+            ["AU4", 5],
+            ["AU5", 5],
+            ["AU9", 5],
+            ["AU12", 5],
+            ["AU15", 5],
+            ["AU17", 5],
+            ["AU25", 5],
+            ["AU27", 5],
+
+            ["Normal", 5],
+            ["Pain", 5]
+        ];
+        
+        function submitData(){
+            let dataErea = document.getElementById("dataErea");
+            let txt = dataErea.value;
+            var arr = txt.split(/\r?\n/);
+            
+            cellIndex = 0;
+            num_ind = 0;
+            for (let index = 0; index < arr.length; index++) {
+                
+                let name = _cellData[cellIndex][0];
+                const timeString = arr[index];
+
+                if (timeString.length==0)  continue;
+                
+                let input = document.getElementById(name+num_ind);
+                input.value = timeString;
+
+                cellNum = _cellData[cellIndex][1];
+                num_ind++; 
+                if (num_ind == cellNum) {
+                    num_ind = 0;
+                    cellIndex++;
+                }
+            }
+
+        }
+        function saveData() {
+            var obj = new Object();
+            ID = document.getElementById('inputID').value;
+
+            if (ID.length<=0) {
+                alert('ID cannot be empty!');
+                return;
+            }
+            obj.id = ID;
+            name = document.getElementById('inputName').value;
+
+            if (name.length<=0) {
+                alert('Name cannot be empty!');
+                return;
+            }
+            obj.name = name;
+            
+            obj.gender = document.getElementById('inputGender').value;
+            obj.date = Date();
+
+            obj.dataArr = [];
+            for (const index in _cellData) {
+                if (_cellData.hasOwnProperty(index)) {
+                    const element = _cellData[index];
+                    let item_name = element[0];
+                    let item_num = element[1];
+
+                    var data = new Object();
+                    data.name = item_name;
+                    data.times = [];
+                    for (let i = 0; i < item_num; i++) {
+                        let inp = document.getElementById(item_name+i);
+                        data.times.push(inp.value);
+                    }
+                    obj.dataArr.push(data);
+                }
+            }
+            json = JSON.stringify(obj);
+            //alert('Hello world!\n'+json);
+            var file = new File([json], name+ID+".json", { type: "text/plain;charset=utf-8" });
+            saveAs(file);
+
+        }
 
     </script>
 
@@ -76,53 +146,102 @@
 
 
     <div class="container" id="homeView">
-        <div class="container" id="expressionView">
-            <div class="container" id="cell">
-
-                <div class="input-group mb-3">
-                    <button type="button" class="btn btn-default btn-md" id="CellAdd">
-                        <span class="fa fa-plus-circle" aria-hidden="true"></span>
-                    </button>
-                    <input type="text" class="form-control" autocomplete="off" value="Anger" id="demo" name="name">
-                    <div class="input-group-append">
-                        <div class="container" id="rightCell">
-
-                            <input type="text" class="form-control" autocomplete="off" id="Anger1" name="name">
-                            <input type="text" class="form-control" autocomplete="off" id="Anger2" name="name">
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" autocomplete="off" id="Anger3" name="name">
-
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-default btn-md">
-                                        <span class="fa fa-minus-circle" aria-hidden="true"></span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <button type="button" class="btn btn-default btn-md" id="SubCellAdd">
-                                <span class="fa fa-plus-circle" aria-hidden="true"></span>
-                            </button>
-                        </div>
-
-                    </div>
-                    <button type="button" class="btn btn-default btn-md" id="CellDelete">
-                        <span class="fa fa-minus-circle" aria-hidden="true"></span>
-                    </button>
-                </div>
-
-
+        <div class="row align-items-end">
+            <div class='form-group col-md' id='dataView'>
+                <label for="dataErea">输入数据：</label>
+                <textarea class="form-control" id="dataErea" rows="5"></textarea>
             </div>
+            <div class="col-sm">
+                    <button type="submit" onclick='submitData()' class="btn btn-primary mb-2">Submit</button>
+            </div>
+        </div>
+
+        <div class="container mb-3">
+            <div class="row align-items-centers" id='personInfo'>
+                <div class="input-group col-sm">
+                    <label for="inputID">ID：</label>
+                    <input type="text" class="form-control" autocomplete="off" value="1" placeholder="name" id="inputID">
+                </div>
+                <div class="input-group col-sm">
+                    <label for="inputName">Name：</label>
+                    <input type="text" class="form-control" autocomplete="off" placeholder="First Last" id="inputName">
+        
+                </div>
+                <div class="input-group col-sm">
+                    <label for="inputGender">Gender：</label>
+                    <select class="custom-select" id="inputGender">
+                        <option selected value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" id="cells">
 
 
         </div>
+        <button type='button' class='btn btn-default btn-lg mb-3' onclick="saveData()" id= saveData >Save
+                <!-- <span class='fa fa-plus-circle' aria-hidden='true'></span> -->
+        </button>
+
+
     </div>
 
 
     <script>
-        for (let index = 0; index < _cellData.length; index++) {
-            const element = _cellData[index];
-            
+        function createCelles() {
+            for (let index = 0; index < _cellData.length; index++) {
+                const item = _cellData[index];
+                let name = item[0];
+                let number = item[1];
+
+                var cell = document.createElement("div");
+                cell.className = "row mb-3";
+                cell.id = "cell_" + index;
+
+                cell.innerHTML =
+                    "<button type='button' class='btn btn-default btn-sm mr-3 col' id= CellAdd_" + index + ">" +
+                    "<span class='fa fa-plus-circle' aria-hidden='true'></span>" +
+                    "</button>" +
+                    "<input type='text' class='form-control-sm col mr-3' autocomplete='off' value=" + name + " id='demo' name=" + name + ">" +
+                   
+                    "<div class='container col' id='rightCell_" + index + "'>" +
+                    "</div>" +
+                    "<div class='col'>"+
+                    "<button type='button' class='btn btn-default btn-sm mr-3 col' id= CellDelete_" + index + ">" +
+                        "<span class='fa fa-minus-circle' aria-hidden='true'></span>"
+                    "</button>"+
+                    "</div>";
+
+                document.getElementById("cells").appendChild(cell);
+
+                //right cell
+                cell.child
+                var rightCell = document.getElementById("rightCell_" + index);
+                for (let rInd = 0; rInd < number; rInd++) {
+                    if (rInd == number - 1) {
+                        rightCell.innerHTML +=
+                            "<div class='row'>" +
+                                "<input type='text' class='form-control-sm col' autocomplete='off' id=" + name + rInd + " name='name'>" +
+                                "<div class='input-group-append col'>" +
+                                    "<button type='button' class='btn btn-default btn-sm col'>" +
+                                        "<span class='fa fa-minus-circle' aria-hidden='true'></span>" +
+                                    "</button>" +
+                                "</div>" +
+                            "</div>";
+                    } else {
+                        rightCell.innerHTML += "<input type='text' class='form-control-sm row' autocomplete='off' id=" + name + rInd + " name='name'>";
+                    }
+                }
+                rightCell.innerHTML +=
+                    "<button type='button' class='btn btn-default btn-md row' id='SubCellAdd'>" +
+                    "<span class='fa fa-plus-circle' aria-hidden='true'></span>" +
+                    "</button>";
+
+            }
         }
+        createCelles();
     </script>
 
 </body>
