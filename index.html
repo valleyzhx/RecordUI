@@ -27,7 +27,9 @@
     </style>
 
     <script>
-        _cellData = [
+        var _cameraTime = 0.0;
+        
+        _data1 =  [
             ["Anger", 3],
             ["Disgust", 3],
             ["Fear", 3],
@@ -39,16 +41,49 @@
             ["AU2", 5],
             ["AU4", 5],
             ["AU5", 5],
+            ["AU6", 5],
             ["AU9", 5],
             ["AU12", 5],
             ["AU15", 5],
             ["AU17", 5],
+            ["AU20", 5],
+            ["AU23", 5],
             ["AU25", 5],
             ["AU27", 5],
 
-            ["Normal", 5],
+            ["Meditation", 5],
             ["Pain", 5]
         ];
+
+        _data2 =  [
+            ["Anger", 3],
+            ["Disgust", 3],
+            ["Fear", 3],
+            ["Happiness", 3],
+            ["Sadness", 3],
+            ["Surprise", 3],
+
+            ["AU1", 5],
+            ["AU2", 5],
+            ["AU4", 5],
+            ["AU5", 5],
+            ["AU6", 5],
+            ["AU9", 5],
+            ["AU12", 5],
+            ["AU15", 5],
+            ["AU17", 5],
+            ["AU20", 5],
+            ["AU23", 5],
+            ["AU25", 5],
+            ["AU27", 5],
+
+            ["Meditation", 1],
+            ["Pain", 1]
+        ];
+
+
+
+        _cellData = _data1;
         
         function submitData(){
             let dataErea = document.getElementById("dataErea");
@@ -79,6 +114,21 @@
             }
         }
 
+        function timeModeAction(){
+            _cellData = _data2;
+            $('#cells').empty();
+            createCelles();
+            $('#timeModeBtn').removeClass('disabled');
+            $('#inputModeBtn').addClass('disabled');
+        }
+        function inputModeAction(){
+            _cellData = _data1;
+            $('#cells').empty();
+            createCelles();
+            $('#inputModeBtn').removeClass('disabled');
+            $('#timeModeBtn').addClass('disabled');
+        }
+
 
         function saveData() {
             var obj = new Object();
@@ -98,7 +148,25 @@
             obj.name = name;
             
             obj.gender = document.getElementById('inputGender').value;
+
+            age = $('#inputAge')[0].value;
+            if (age.length<=0) {
+                alert('Age cannot be empty!');
+                return;
+            }
+            obj.age = age;
+
+            race = $('#inputRace')[0].value;
+            if (race.length<=0) {
+                alert('race cannot be empty!');
+                return;
+            }
+            obj.race = race;
+            
             obj.date = Date();
+            if(_cameraTime>0){
+                obj.camera = _cameraTime.toFixed(1);
+            }
 
             obj.dataArr = [];
             for (const index in _cellData) {
@@ -119,19 +187,14 @@
             }
             json = JSON.stringify(obj);
             //alert('Hello world!\n'+json);
-
-            
             var file = new File([json], ID+".json", { type: "text/plain;charset=utf-8" });
             saveAs(file);
-
         }
-
     </script>
 
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -140,59 +203,79 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <!-- <li class="nav-item active">
-                    <button class="btn btn-primary btn-sm" data-target="#homeView">Home</button>
-                </li> -->
+                <li class="nav-item mr-3">
+                    <button class="btn btn-primary btn-md" id="inputModeBtn" onclick="inputModeAction()">Input Mode</button>
+                </li>
                 <li class="nav-item">
-                    <button class="btn btn-primary btn-md" data-toggle="modal" data-target="#myModal">Time</button>
+                    <button class="btn btn-primary btn-md disabled" id="timeModeBtn" data-toggle="modal" onclick="timeModeAction()" data-target="#myModal">Time Mode</button>
                 </li>
 
             </ul>
         </div>
     </nav>
 
-
-    <div class="container" id="homeView">
-        <div class="row align-items-end">
+    <div class="row ml-2" id='homeView'>
+        <div class="container col-md-8 mt-2" id="leftView">
+            <div class="container mb-3">
+                <div class="row align-items-centers mb-3" id='personInfo'>
+                    <div class="input-group col-sm">
+                        <label for="inputID">ID：</label>
+                        <input type="text" class="form-control" autocomplete="off" value="sub_1" placeholder="name" id="inputID">
+                    </div>
+                    <div class="input-group col-sm">
+                        <label for="inputName">Name：</label>
+                        <input type="text" class="form-control" autocomplete="off" placeholder="First Last" id="inputName">
+    
+                    </div>
+                    <div class="input-group col-sm">
+                        <label for="inputAge">Age：</label>
+                        <input type="text" class="form-control" autocomplete="off" id="inputAge">
+                    </div>
+                </div>
+                <div class="row align-items-centers" id='personInfo2'>
+    
+                    <div class="input-group col-sm">
+                        <label for="inputGender">Gender：</label>
+                        <select class="custom-select" id="inputGender">
+                            <option selected value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="input-group col-sm">
+                        <label for="inputRace">Race：</label>
+                        <input type="text" class="form-control" autocomplete="off" id="inputRace">
+                    </div>
+    
+                </div>
+    
+            </div>
+    
+            <div class="container ml-3" id="cells">
+            </div>
+            <button type='button' class='btn btn-primary btn-lg btn-block mb-5' onclick="saveData()" id=saveData>Save
+                <!-- <span class='fa fa-plus-circle' aria-hidden='true'></span> -->
+            </button>
+        </div>
+        <div class="container col-md-4">
+            <div class="col-sm mt-2">
+                <h5 id='showTime'></h5>
+                <script>
+                    showTime.innerHTML = new Date().toLocaleString();
+                    setInterval("showTime.innerHTML=new Date().toLocaleString()", 1000);  
+                </script>
+            </div>
             <div class='form-group col-md' id='dataView'>
                 <label for="dataErea">输入数据：</label>
-                <textarea class="form-control" id="dataErea" rows="5"></textarea>
+                <textarea class="form-control" id="dataErea" rows="25"></textarea>
             </div>
-            <div class="col-sm">
-                    <button type="submit" onclick='submitData()' class="btn btn-primary mb-2">Submit</button>
+            <div class="col-sm mt-5">
+                <button type="submit" onclick='submitData()' class="btn btn-primary mb-2">Submit</button>
             </div>
-        </div>
-
-        <div class="container mb-3">
-            <div class="row align-items-centers" id='personInfo'>
-                <div class="input-group col-sm">
-                    <label for="inputID">ID：</label>
-                    <input type="text" class="form-control" autocomplete="off" value="sub_1" placeholder="name" id="inputID">
-                </div>
-                <div class="input-group col-sm">
-                    <label for="inputName">Name：</label>
-                    <input type="text" class="form-control" autocomplete="off" placeholder="First Last" id="inputName">
         
-                </div>
-                <div class="input-group col-sm">
-                    <label for="inputGender">Gender：</label>
-                    <select class="custom-select" id="inputGender">
-                        <option selected value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-                </div>
-            </div>
         </div>
-
-        <div class="container" id="cells">
-
-        </div>
-        <button type='button' class='btn btn-primary btn-lg btn-block mb-5' onclick="saveData()" id= saveData >Save
-                <!-- <span class='fa fa-plus-circle' aria-hidden='true'></span> -->
-        </button>
-
-
     </div>
+
+    
     <!-- 模态框（Modal） -->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -208,17 +291,19 @@
                 </div>
                 <div class="modal-body">
                     <h3 id="timeLabel">0.0</h3>
-                    <button type="button" class="btn btn-primary" onclick="timeStart()">Timer Start!
+                    <button type="button" class="btn btn-primary" id="timerButton" onclick="timeStart()">Timer Start!
                     </button>
                     <h4 id>Camera:</h4>
+                    <button type="button" class="btn btn-success disabled" id="cameraButton" disabled=true onclick="cameraAction()">Camera 
+                    </button>
 
                 </div>
                 <div class="modal-body">
-                    <h3>Actions</h3>
-                    <h4 id="expressionLabel"></h4>
-                    <button type="button" class="btn btn-primary" onclick="actionStart()">Action Begin!
+                    <h3>Actions('Space' key is also worked)</h3>
+                    <h5 class="mb-3 mt-3" id="expressionLabel" ></h5>
+                    <button type="button" class="btn btn-primary disabled" id="startButton" disabled=true onclick="actionStart()">Action Begin!
                     </button>
-                    <button type="button" class="btn btn-success">Action End!
+                    <button type="button" class="btn btn-success disabled" id="endButton" disabled=true onclick="actionEnd()">Action End!
                     </button>
                 </div>
                 <div class="modal-footer">
@@ -229,46 +314,105 @@
         </div><!-- /.modal -->
         <script>
             
-
-
-
             var c = 0.0;
             function timeStart() {
                 c = 0.0;
                 timedCount();
-            }
+                $('#timerButton').addClass('disabled');
+                $('#timerButton').prop('disabled', true);
 
+                $('#cameraButton').removeClass('disabled');
+                $('#cameraButton').prop('disabled', false);
+            }
             function timedCount() {
                 c = c + 0.1
                 document.getElementById('timeLabel').innerHTML = c.toFixed(1);
                 setTimeout("timedCount()", 100)
             }
+            function cameraAction() {
+                _cameraTime = c;
+                $('#cameraButton').addClass('disabled');
+                $('#cameraButton').prop('disabled', true);
+
+                $('#startButton').removeClass('disabled');
+                $('#startButton').prop('disabled', false);
+            }
+
+            
             var timeObj = new Object();
             var cellIndex = 0;
             var timeString = '';
             var showTimeStr = '';
             function actionStart() {
-                    timeString += c+' ';
-                    document.getElementById('expressionLabel').innerHTML += '['+c;
-            }
+                    timeString = c.toFixed(1) + ' ';
+                    document.getElementById('expressionLabel').innerHTML += '[' + c.toFixed(1);
+                    $('#startButton').addClass('disabled');
+                    $('#startButton').prop('disabled', true);
+
+                    $('#endButton').removeClass('disabled');
+                    $('#endButton').prop('disabled', false);
+                }
+
             var timeArr = [];
             var tIndex = 0;
+            var endCount = 0;
+
+            cell = _cellData[tIndex];
+            cell_name = cell[0];
+            cell_num = cell[1];
             function actionEnd() {
-                    timeString += c;
-                    tempStr = timeString;
-                    timeArr.push(tempStr);
-                    document.getElementById('expressionLabel').innerHTML += ' '+c+']';
+                    timeString += c.toFixed(1);
+                    timeArr.push(timeString);
+                    
+                    document.getElementById('expressionLabel').innerHTML += ' '+c.toFixed(1)+']';
+                    $('#dataErea')[0].value += timeString+'\n';
+                    endCount ++;
+
+                    $('#endButton').addClass('disabled');
+                    $('#endButton').prop('disabled', true);
+
+                    
+                    
+                    if (endCount == cell_num) {
+                        tIndex++;
+                        endCount=0;
+                        setTimeout("changeExpression();"+
+                                   "$('#startButton').removeClass('disabled');"+
+                                   "$('#startButton').prop('disabled', false);", 600);
+                        applyToCells(timeArr);
+                    }else{
+                        $('#startButton').removeClass('disabled');
+                        $('#startButton').prop('disabled', false);
+                    }
+
             }
             function changeExpression() {
                 cell = _cellData[tIndex];
                 cell_name = cell[0];
                 cell_num =  cell[1];
                 document.getElementById('expressionLabel').innerHTML = cell_name+': ';
-
-                tIndex++;
             }
-
             changeExpression();
+            
+            //实际使用
+		 document.onkeydown=function(e){	//对整个页面文档监听
+		 	var keyNum=window.event ? e.keyCode :e.which;		//获取被按下的键值
+		 	
+		 	//判断如果用户按下了空格键(keycode=32)，
+		 	if(keyNum==32){
+		 		 //
+                if (_cameraTime!=0) {
+                    //alert('您按下了空格');
+                    if ($('#startButton').prop('disabled')==false) {
+                        actionStart();
+                    }else if ($('#endButton').prop('disabled')==false) {
+                        actionEnd();
+                    }
+                }
+			 	}
+		 }
+
+
         </script>
     </div>
 
@@ -287,17 +431,17 @@
                 cell.id = "cell_" + index;
 
                 cell.innerHTML =
-                    "<button type='button' class='btn btn-default btn-sm mr-3 col' id= CellAdd_" + index + ">" +
-                    "<span class='fa fa-plus-circle' aria-hidden='true'></span>" +
-                    "</button>" +
+                    // "<button type='button' class='btn btn-default btn-sm mr-3 col' id= CellAdd_" + index + ">" +
+                    // "<span class='fa fa-plus-circle' aria-hidden='true'></span>" +
+                    // "</button>" +
                     "<input type='text' class='form-control-sm col mr-3' autocomplete='off' value=" + name + " id='demo' name=" + name + ">" +
                    
                     "<div class='container col' id='rightCell_" + index + "'>" +
                     "</div>" +
                     "<div class='col'>"+
-                    "<button type='button' class='btn btn-default btn-sm mr-3 col' id= CellDelete_" + index + ">" +
-                        "<span class='fa fa-minus-circle' aria-hidden='true'></span>"
-                    "</button>"+
+                    // "<button type='button' class='btn btn-default btn-sm mr-3 col' id= CellDelete_" + index + ">" +
+                    //     "<span class='fa fa-minus-circle' aria-hidden='true'></span>"
+                    // "</button>"+
                     "</div>";
 
                 document.getElementById("cells").appendChild(cell);
@@ -311,19 +455,19 @@
                             "<div class='row'>" +
                                 "<input type='text' class='form-control-sm col' autocomplete='off' id=" + name + rInd + " name='name'>" +
                                 "<div class='input-group-append col'>" +
-                                    "<button type='button' class='btn btn-default btn-sm col'>" +
-                                        "<span class='fa fa-minus-circle' aria-hidden='true'></span>" +
-                                    "</button>" +
+                                    // "<button type='button' class='btn btn-default btn-sm col'>" +
+                                    //     "<span class='fa fa-minus-circle' aria-hidden='true'></span>" +
+                                    // "</button>" +
                                 "</div>" +
                             "</div>";
                     } else {
                         rightCell.innerHTML += "<input type='text' class='form-control-sm row' autocomplete='off' id=" + name + rInd + " name='name'>";
                     }
                 }
-                rightCell.innerHTML +=
-                    "<button type='button' class='btn btn-default btn-md row' id='SubCellAdd'>" +
-                    "<span class='fa fa-plus-circle' aria-hidden='true'></span>" +
-                    "</button>";
+                // rightCell.innerHTML +=
+                //     "<button type='button' class='btn btn-default btn-md row' id='SubCellAdd'>" +
+                //     "<span class='fa fa-plus-circle' aria-hidden='true'></span>" +
+                //     "</button>";
 
             }
         }
