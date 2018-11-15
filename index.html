@@ -17,13 +17,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     <script src="./FileSaver.js"></script>
     <style>
-        /* cell {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.428571429;
-  color: #333333;
-  background-color: #e62424;
-} */
+        
     </style>
 
     <script>
@@ -81,9 +75,7 @@
             ["Pain", 1]
         ];
 
-
-
-        _cellData = _data1;
+        _cellData = _data2;
         
         function submitData(){
             let dataErea = document.getElementById("dataErea");
@@ -115,20 +107,10 @@
         }
 
         function timeModeAction(){
-            _cellData = _data2;
             $('#cells').empty();
-            createCelles();
-            $('#timeModeBtn').removeClass('disabled');
-            $('#inputModeBtn').addClass('disabled');
+            createCelles();            
         }
-        function inputModeAction(){
-            _cellData = _data1;
-            $('#cells').empty();
-            createCelles();
-            $('#inputModeBtn').removeClass('disabled');
-            $('#timeModeBtn').addClass('disabled');
-        }
-
+        
 
         function saveData() {
             var obj = new Object();
@@ -203,13 +185,9 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item mr-3">
-                    <button class="btn btn-primary btn-md" id="inputModeBtn" onclick="inputModeAction()">Input Mode</button>
-                </li>
                 <li class="nav-item">
-                    <button class="btn btn-primary btn-md disabled" id="timeModeBtn" data-toggle="modal" onclick="timeModeAction()" data-target="#myModal">Time Mode</button>
+                    <button class="btn btn-primary btn-md" id="timeModeBtn" data-toggle="modal" onclick="timeModeAction()" data-target="#myModal">Time Mode</button>
                 </li>
-
             </ul>
         </div>
     </nav>
@@ -293,7 +271,7 @@
                     <h3 id="timeLabel">0.0</h3>
                     <button type="button" class="btn btn-primary" id="timerButton" onclick="timeStart()">Timer Start!
                     </button>
-                    <h4 id>Camera:</h4>
+                    <h4 id='cameraLabel'>Camera:</h4>
                     <button type="button" class="btn btn-success disabled" id="cameraButton" disabled=true onclick="cameraAction()">Camera 
                     </button>
 
@@ -315,9 +293,9 @@
         <script>
             
             var startDate;
-            var c = 0.0;
+            
             function timeStart() {
-                c = 0.0;
+                
                 startDate=new Date()
                 timedCount();
                 $('#timerButton').addClass('disabled');
@@ -327,13 +305,16 @@
                 $('#cameraButton').prop('disabled', false);
             }
             function timedCount() {
-                c = c + 0.1
-                document.getElementById('timeLabel').innerHTML = c.toFixed(1);
+                gap = (new Date() - startDate)/1000;
+                document.getElementById('timeLabel').innerHTML = gap.toFixed(1);
                 
                 setTimeout("timedCount()", 100)
             }
             function cameraAction() {
-                _cameraTime = c;
+                _cameraTime =  (new Date() - startDate)/1000;
+                document.getElementById('cameraLabel').innerHTML = "Camera: "+ _cameraTime.toFixed(1);
+
+
                 $('#cameraButton').addClass('disabled');
                 $('#cameraButton').prop('disabled', true);
 
@@ -347,8 +328,9 @@
             var timeString = '';
             var showTimeStr = '';
             function actionStart() {
-                    timeString = c.toFixed(1) + ' ';
-                    document.getElementById('expressionLabel').innerHTML += '[' + c.toFixed(1);
+                    gap = (new Date() - startDate)/1000;
+                    timeString = gap.toFixed(1) + ' ';
+                    document.getElementById('expressionLabel').innerHTML += '[' + gap.toFixed(1);
                     $('#startButton').addClass('disabled');
                     $('#startButton').prop('disabled', true);
 
@@ -364,10 +346,11 @@
             cell_name = cell[0];
             cell_num = cell[1];
             function actionEnd() {
-                    timeString += c.toFixed(1);
+                    gap = (new Date() - startDate)/1000;
+                    timeString += gap.toFixed(1);
                     timeArr.push(timeString);
                     
-                    document.getElementById('expressionLabel').innerHTML += ' '+c.toFixed(1)+']';
+                    document.getElementById('expressionLabel').innerHTML += ' '+gap.toFixed(1)+']';
                     $('#dataErea')[0].value += timeString+'\n';
                     endCount ++;
 
@@ -398,7 +381,7 @@
             changeExpression();
             
             //实际使用
-		 document.onkeydown=function(e){	//对整个页面文档监听
+		 document.onkeyup=function(e){	//对整个页面文档监听
 		 	var keyNum=window.event ? e.keyCode :e.which;		//获取被按下的键值
 		 	
 		 	//判断如果用户按下了空格键(keycode=32)，
